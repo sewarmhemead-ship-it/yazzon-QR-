@@ -1,5 +1,6 @@
 :root { color-scheme: dark; --ink:#f2eee5; --muted:rgba(242,238,229,.48); --line:rgba(242,238,229,.18); --amber:#b88b46; --scene-accent:#b88b46; --bg:#090806; font-synthesis:none; }
 * { box-sizing:border-box; }
+.sr-only { position:fixed!important; width:1px!important; height:1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; }
 html, body { width:100%; height:100%; margin:0; overflow:hidden; background:var(--bg); }
 body { color:var(--ink); font-family:"DM Mono", monospace; -webkit-font-smoothing:antialiased; }
 button, a { color:inherit; font:inherit; }
@@ -54,6 +55,27 @@ footer a { justify-self:end; color:var(--ink); }
 .lightbox__meta small,.lightbox__meta p { color:var(--muted); font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; }
 .lightbox__meta h2 { margin:.35rem 0; font-family:"Italiana",serif; font-size:clamp(2.6rem,7vw,6rem); font-weight:400; }
 .lightbox__close { position:absolute; top:max(1.25rem,env(safe-area-inset-top)); right:1.25rem; padding:.7rem .9rem; border:1px solid rgba(255,255,255,.35); background:rgba(0,0,0,.35); font-size:.6rem; letter-spacing:.15em; text-transform:uppercase; backdrop-filter:blur(10px); cursor:pointer; }
+.moment-dialog { width:min(1100px,calc(100vw - 2rem)); max-width:none; height:min(760px,calc(100svh - 2rem)); max-height:none; margin:auto; padding:0; overflow:hidden; border:1px solid var(--line); background:#080705; color:var(--ink); }
+.moment-dialog::backdrop { background:rgba(0,0,0,.82); backdrop-filter:blur(12px); }
+.moment-form { display:grid; grid-template-columns:1.08fr .92fr; width:100%; height:100%; }
+.moment-form__preview { min-height:0; background:#030302; }
+.moment-form__preview img { width:100%; height:100%; object-fit:contain; }
+.moment-form__content { overflow:auto; padding:clamp(2rem,4vw,4rem); }
+.moment-form__close { position:absolute; z-index:2; top:1rem; right:1rem; padding:.65rem .8rem; border:1px solid var(--line); background:rgba(5,4,3,.62); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; backdrop-filter:blur(10px); cursor:pointer; }
+.moment-form__eyebrow { margin:0 0 .8rem; color:var(--muted); font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; }
+.moment-form h2 { margin:0; font-family:"Italiana",serif; font-size:clamp(2.8rem,5vw,5rem); font-weight:400; line-height:.84; }
+.moment-form__lead { max-width:44ch; margin:1.25rem 0 1.5rem; color:rgba(242,238,229,.62); font-family:Arial,sans-serif; font-size:.9rem; line-height:1.55; }
+.moment-form label:not(.moment-form__consent) { display:grid; grid-template-columns:1fr auto; gap:.35rem; margin-top:1rem; color:rgba(242,238,229,.72); font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; }
+.moment-form label > span { color:var(--muted); }
+.moment-form input:not([type="checkbox"]),.moment-form textarea { grid-column:1/-1; width:100%; border:0; border-bottom:1px solid var(--line); border-radius:0; outline:0; background:transparent; padding:.55rem 0; color:var(--ink); font:400 1rem Arial,sans-serif; resize:none; }
+.moment-form input:focus,.moment-form textarea:focus { border-color:var(--scene-accent); }
+.moment-form__consent { display:flex; gap:.7rem; margin:1.35rem 0; color:rgba(242,238,229,.68); font-family:Arial,sans-serif; font-size:.78rem; line-height:1.4; }
+.moment-form__consent input { flex:0 0 auto; width:17px; height:17px; accent-color:var(--scene-accent); }
+.moment-form__actions { display:flex; gap:.65rem; }
+.moment-form__actions button { min-height:42px; padding:.75rem 1rem; border:1px solid var(--line); background:transparent; font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
+.moment-form__actions .moment-form__submit { margin-left:auto; background:var(--ink); color:#080705; }
+.moment-form__actions button:disabled { opacity:.4; cursor:wait; }
+.moment-form__status { min-height:1.2em; color:rgba(242,238,229,.68); font-size:.68rem; line-height:1.5; }
 @keyframes reveal { from { opacity:0; clip-path:inset(42% 42% round 20px); } }
 @keyframes breathe { to { opacity:.3; transform:scaleX(.55); transform-origin:left; } }
 @media (max-width:640px) {
@@ -74,5 +96,12 @@ footer a { justify-self:end; color:var(--ink); }
   .lightbox__shade { background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 20%,transparent 62%,rgba(0,0,0,.88)); }
   .lightbox__meta { left:1.25rem; bottom:max(1rem,env(safe-area-inset-bottom)); }
   .lightbox__meta h2 { font-size:clamp(2rem,10vw,3.2rem); }
+  .open-active.share-moment { max-width:175px; line-height:1.35; text-align:left; }
+  .moment-dialog { width:100vw; height:100svh; border:0; }
+  .moment-form { display:flex; flex-direction:column; overflow:auto; }
+  .moment-form__preview { flex:0 0 43svh; }
+  .moment-form__content { flex:1 0 auto; overflow:visible; padding:1.5rem 1.25rem max(2rem,env(safe-area-inset-bottom)); }
+  .moment-form h2 { font-size:clamp(2.7rem,14vw,4rem); }
+  .moment-form__actions { position:sticky; bottom:0; padding:.65rem 0; background:#080705; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }

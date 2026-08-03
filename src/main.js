@@ -156,15 +156,85 @@ function updateCopy(index){
 
 function down(e){ dragging=true;moved=false;startX=lastX=e.clientX;velocity=0;canvas.setPointerCapture(e.pointerId); }
 function move(e){ if(!dragging)return; const dx=e.clientX-lastX; if(Math.abs(e.clientX-startX)>6)moved=true; position-=dx/(innerWidth<640?170:280); velocity=-dx/(innerWidth<640?170:280); lastX=e.clientX; }
-function up(e){ if(!dragging)return; dragging=false;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId); target=Math.round(position+velocity*5); }
+const raycaster=new THREE.Raycaster();
+const pointerNdc=new THREE.Vector2();
+function up(e){
+  if(!dragging)return;
+  dragging=false;
+  if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+  target=Math.round(position+velocity*5);
+  if(!moved){
+    pointerNdc.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);
+    raycaster.setFromCamera(pointerNdc,camera);
+    if(raycaster.intersectObject(meshes[active].mesh,false).length)openPhoto();
+  }
+}
 canvas.addEventListener("pointerdown",down); canvas.addEventListener("pointermove",move); canvas.addEventListener("pointerup",up); canvas.addEventListener("pointercancel",up);
 canvas.addEventListener("wheel",e=>{ if(Math.abs(e.deltaY)+Math.abs(e.deltaX)<5)return; target=Math.round(position)+(e.deltaY+e.deltaX>0?1:-1); },{passive:true});
 window.addEventListener("keydown",e=>{ if(e.key==="ArrowRight")target=Math.round(position)+1; if(e.key==="ArrowLeft")target=Math.round(position)-1; if(e.key==="Enter")openPhoto(); if(e.key==="Escape")closePhoto(); });
 
 const lightbox=document.querySelector("#lightbox");
 function openPhoto(){ const photo=photos[active]; document.querySelector("#lightboxImage").src=photo.src; document.querySelector("#lightboxImage").alt=photo.title; document.querySelector("#lightboxNumber").textContent=`Photograph ${String(active+1).padStart(2,"0")}`; document.querySelector("#lightboxTitle").textContent=photo.title; lightbox.hidden=false; document.querySelector("#closeLightbox").focus(); }
-function closePhoto(){ if(lightbox.hidden)return;lightbox.hidden=true;document.querySelector("#openActive").focus(); }
-document.querySelector("#openActive").onclick=openPhoto; document.querySelector("#closeLightbox").onclick=closePhoto; lightbox.addEventListener("click",e=>{if(e.target===lightbox)closePhoto()});
+function closePhoto(){ if(lightbox.hidden)return;lightbox.hidden=true;document.querySelector("#shareMoment").focus(); }
+document.querySelector("#closeLightbox").onclick=closePhoto; lightbox.addEventListener("click",e=>{if(e.target===lightbox)closePhoto()});
+
+const shareMoment=document.querySelector("#shareMoment");
+const cameraInput=document.querySelector("#cameraInput");
+const momentDialog=document.querySelector("#momentDialog");
+const momentForm=document.querySelector("#momentForm");
+const momentPreview=document.querySelector("#momentPreview");
+const momentStatus=document.querySelector("#momentStatus");
+let momentFile=null,momentUrl="";
+
+shareMoment.onclick=()=>cameraInput.click();
+document.querySelector("#retakeMoment").onclick=()=>cameraInput.click();
+document.querySelector("#closeMoment").onclick=()=>momentDialog.close();
+cameraInput.onchange=()=>{
+  const file=cameraInput.files?.[0]; if(!file)return;
+  if(!file.type.startsWith("image/")){momentStatus.textContent="Please choose a photograph.";return;}
+  momentFile=file;
+  const submit=momentForm.querySelector('[type="submit"]');
+  submit.disabled=false; submit.innerHTML='Send for review <span>↗</span>';
+  if(momentUrl)URL.revokeObjectURL(momentUrl);
+  momentUrl=URL.createObjectURL(file); momentPreview.src=momentUrl;
+  momentStatus.textContent="";
+  if(!momentDialog.open)momentDialog.showModal();
+};
+momentDialog.addEventListener("close",()=>{shareMoment.focus()});
+
+async function prepareMoment(file){
+  const bitmap=await createImageBitmap(file,{imageOrientation:"from-image"});
+  const max=2400,scale=Math.min(1,max/Math.max(bitmap.width,bitmap.height));
+  const width=Math.round(bitmap.width*scale),height=Math.round(bitmap.height*scale);
+  const output=document.createElement("canvas"); output.width=width;output.height=height;
+  output.getContext("2d",{alpha:false}).drawImage(bitmap,0,0,width,height); bitmap.close();
+  return new Promise((resolve,reject)=>output.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not prepare photograph.")),"image/jpeg",.9));
+}
+
+momentForm.onsubmit=async event=>{
+  event.preventDefault(); if(!momentFile)return;
+  const submit=momentForm.querySelector('[type="submit"]'); submit.disabled=true;
+  momentStatus.textContent="Preparing your photograph …";
+  const supabaseUrl=import.meta.env.VITE_SUPABASE_URL;
+  const anonKey=import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if(!supabaseUrl||!anonKey){momentStatus.textContent="Photo submissions are not connected yet. Add the Supabase project keys to enable sending.";submit.disabled=false;return;}
+  try{
+    const blob=await prepareMoment(momentFile);
+    const id=crypto.randomUUID(); const path=`pending/${new Date().toISOString().slice(0,10)}/${id}.jpg`;
+    const headers={apikey:anonKey,Authorization:`Bearer ${anonKey}`};
+    const upload=await fetch(`${supabaseUrl}/storage/v1/object/yazzoon-moments/${path}`,{method:"POST",headers:{...headers,"Content-Type":"image/jpeg","x-upsert":"false"},body:blob});
+    if(!upload.ok)throw new Error("The photograph could not be uploaded.");
+    const data=new FormData(momentForm);
+    const submission={id,storage_path:path,guest_name:String(data.get("guestName")||"").trim()||null,guest_email:String(data.get("guestEmail")||"").trim()||null,caption:String(data.get("caption")||"").trim()||null,status:"pending",consent_version:"2026-08-03"};
+    const insert=await fetch(`${supabaseUrl}/rest/v1/yazzoon_moments`,{method:"POST",headers:{...headers,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(submission)});
+    if(!insert.ok)throw new Error("The review request could not be created.");
+    fetch(`${supabaseUrl}/functions/v1/notify-yazzoon-moment`,{method:"POST",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({submissionId:id})}).catch(()=>{});
+    momentForm.reset();cameraInput.value="";momentFile=null;
+    momentStatus.textContent="Thank you. Your YAZZOON moment was sent for review.";
+    submit.textContent="Sent ✓";
+    setTimeout(()=>momentDialog.close(),1800);
+  }catch(error){momentStatus.textContent=error instanceof Error?error.message:"The photograph could not be sent. Please try again.";submit.disabled=false;}
+};
 
 function resize(){ renderer.setSize(innerWidth,innerHeight,false); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
 addEventListener("resize",resize); resize(); updateCopy(0);

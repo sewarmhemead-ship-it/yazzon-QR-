@@ -45,7 +45,8 @@
       </section>
 
       <div class="interaction-hint" aria-hidden="true"><i></i><span>Swipe to wander</span></div>
-      <button class="open-active" id="openActive" type="button">View photograph <span>↗</span></button>
+      <button class="open-active share-moment" id="shareMoment" type="button">Share your YAZZOON moment <span>↗</span></button>
+      <input id="cameraInput" class="sr-only" type="file" accept="image/*" capture="environment" />
 
       <nav class="dots" aria-label="Choose photograph"></nav>
 
@@ -59,6 +60,27 @@
         </div>
         <button id="closeLightbox" class="lightbox__close" type="button" aria-label="Close photograph">Close ×</button>
       </div>
+
+      <dialog class="moment-dialog" id="momentDialog" aria-labelledby="momentTitle">
+        <form id="momentForm" class="moment-form">
+          <button class="moment-form__close" id="closeMoment" type="button" aria-label="Close submission">Close ×</button>
+          <div class="moment-form__preview"><img id="momentPreview" alt="Your YAZZOON moment preview" /></div>
+          <div class="moment-form__content">
+            <p class="moment-form__eyebrow">The living archive</p>
+            <h2 id="momentTitle">Share your<br />YAZZOON moment.</h2>
+            <p class="moment-form__lead">Send your photograph to the YAZZOON team. Every submission is reviewed before it appears in the gallery.</p>
+            <label>Name <span>Optional</span><input name="guestName" autocomplete="name" maxlength="80" /></label>
+            <label>Email <span>Optional</span><input name="guestEmail" type="email" autocomplete="email" maxlength="160" /></label>
+            <label>Tell us about this moment <span>Optional</span><textarea name="caption" rows="2" maxlength="240"></textarea></label>
+            <label class="moment-form__consent"><input name="consent" type="checkbox" required /><span>I took this photograph and allow YAZZOON to review and publish it in this gallery.</span></label>
+            <div class="moment-form__actions">
+              <button id="retakeMoment" type="button">Retake</button>
+              <button class="moment-form__submit" type="submit">Send for review <span>↗</span></button>
+            </div>
+            <p id="momentStatus" class="moment-form__status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </dialog>
 
       <footer><span>Ursulinenplatz 4 · 5020 Salzburg</span><a href="https://www.yazzoon.com" target="_blank" rel="noreferrer">Visit YAZZOON ↗</a></footer>
     </main>
