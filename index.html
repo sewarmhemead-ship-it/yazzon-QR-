@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#090806" />
+    <meta name="description" content="YAZZOON — ein fotografisches Archiv aus Salzburg." />
+    <title>YAZZOON — The Living Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Italiana&display=swap" rel="stylesheet" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <main class="gallery" aria-label="YAZZOON photo archive">
+      <canvas id="scene" aria-hidden="true"></canvas>
+      <div class="grain" aria-hidden="true"></div>
+      <header class="topbar">
+        <a class="wordmark" href="/" aria-label="Yazzoon home">YAZZOON</a>
+        <span>Salzburg · Living archive</span>
+        <span id="counter">01 / 05</span>
+      </header>
+
+      <section class="intro" aria-labelledby="title">
+        <p>Moments at the table</p>
+        <h1 id="title">The night<br />remembers.</h1>
+        <div class="active-copy" aria-live="polite">
+          <span id="chapter">Chapter 01</span>
+          <strong id="caption">A table begins</strong>
+        </div>
+      </section>
+
+      <div class="interaction-hint" aria-hidden="true"><i></i><span>Swipe to wander</span></div>
+      <button class="open-active" id="openActive" type="button">View photograph <span>↗</span></button>
+
+      <nav class="dots" aria-label="Choose photograph"></nav>
+
+      <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photograph detail" hidden>
+        <img id="lightboxImage" alt="" />
+        <div class="lightbox__shade"></div>
+        <div class="lightbox__meta">
+          <small id="lightboxNumber"></small>
+          <h2 id="lightboxTitle"></h2>
+          <p>YAZZOON · Salzburg</p>
+        </div>
+        <button id="closeLightbox" class="lightbox__close" type="button" aria-label="Close photograph">Close ×</button>
+      </div>
+
+      <footer><span>Ursulinenplatz 4 · 5020 Salzburg</span><a href="https://www.yazzoon.com" target="_blank" rel="noreferrer">Visit YAZZOON ↗</a></footer>
+    </main>
+  </body>
+</html>
