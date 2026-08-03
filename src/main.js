@@ -22,14 +22,21 @@ const group = new THREE.Group();
 scene.add(group);
 
 const loader = new THREE.TextureLoader();
-const geometry = new THREE.PlaneGeometry(3.65,2.55,1,1);
+const geometry = new THREE.PlaneGeometry(3.65,2.42,1,1);
+const frameGeometry = new THREE.PlaneGeometry(3.78,2.55,1,1);
 const meshes = photos.map((photo,index) => {
   const texture = loader.load(photo.src, tex => { tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4); });
   const material = new THREE.MeshBasicMaterial({ map:texture, transparent:true, opacity:1, side:THREE.DoubleSide });
   const mesh = new THREE.Mesh(geometry,material);
   mesh.userData.index=index;
-  group.add(mesh);
-  return mesh;
+  const frame = new THREE.Mesh(frameGeometry,new THREE.MeshBasicMaterial({ color:0x080705, transparent:true, opacity:.96, side:THREE.DoubleSide }));
+  frame.position.z=-.035;
+  const reflection = new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({ map:texture, transparent:true, opacity:.12, side:THREE.DoubleSide, depthWrite:false }));
+  reflection.scale.y=-.62;
+  const unit = new THREE.Group();
+  unit.add(frame,mesh,reflection);
+  group.add(unit);
+  return { unit, mesh, frame, reflection };
 });
 
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(30,18),new THREE.MeshBasicMaterial({ color:0x7d542b, transparent:true, opacity:.11, side:THREE.DoubleSide }));
@@ -71,16 +78,21 @@ function frame(){
   const dt=Math.min(clock.getDelta()*60,2);
   if(!dragging){ position+=(target-position)*Math.min(.12*dt,1); }
   const nearest=wrap(Math.round(position)); if(nearest!==active)updateCopy(nearest);
-  meshes.forEach((mesh,index)=>{
+  meshes.forEach(({unit,mesh,frame,reflection},index)=>{
     let d=index-position; while(d>photos.length/2)d-=photos.length; while(d<-photos.length/2)d+=photos.length;
     const angle=d*.73;
-    const x=Math.sin(angle)*(innerWidth<640?3.1:4.7);
-    const z=(Math.cos(angle)-1)*4.2;
-    mesh.position.set(x,-.25+Math.abs(d)*.12,z);
-    mesh.rotation.y=-d*.48;
-    const scale=Math.max(.62,1-Math.abs(d)*.16); mesh.scale.setScalar(scale);
+    const galleryOffset=innerWidth<640?0:1.05;
+    const x=galleryOffset+Math.sin(angle)*(innerWidth<640?3.25:4.9);
+    const z=(Math.cos(angle)-1)*4.8;
+    unit.position.set(x,-.38+Math.abs(d)*.16,z);
+    unit.rotation.y=-d*.57;
+    const scale=Math.max(.58,1-Math.abs(d)*.18); unit.scale.setScalar(scale);
     mesh.material.opacity=Math.max(.16,1-Math.abs(d)*.3);
-    mesh.renderOrder=10-Math.round(Math.abs(d));
+    frame.material.opacity=Math.max(.34,.96-Math.abs(d)*.22);
+    reflection.position.set(0,-3.02,.06);
+    reflection.material.opacity=Math.max(.025,.14-Math.abs(d)*.045);
+    reflection.material.map=mesh.material.map;
+    unit.renderOrder=10-Math.round(Math.abs(d));
   });
   group.rotation.y+=((innerWidth<640?0:.035)-group.rotation.y)*.04;
   renderer.render(scene,camera);

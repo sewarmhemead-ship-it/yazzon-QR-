@@ -18,9 +18,9 @@ a { text-decoration:none; }
 .topbar { top:max(1.35rem,env(safe-area-inset-top)); }
 .topbar > :last-child { justify-self:end; }
 .wordmark { font-family:"Italiana",serif; font-size:1.1rem; letter-spacing:.17em; color:var(--ink); }
-.intro { position:absolute; z-index:3; top:clamp(5rem,12vh,8rem); left:clamp(1.25rem,4.5vw,5rem); pointer-events:none; }
+.intro { position:absolute; z-index:3; top:clamp(5rem,12vh,8rem); left:clamp(1.25rem,4.5vw,5rem); width:min(35vw,430px); pointer-events:none; }
 .intro > p { margin:0 0 .8rem; color:var(--muted); font-size:.62rem; letter-spacing:.22em; text-transform:uppercase; }
-h1 { margin:0; font-family:"Italiana",serif; font-size:clamp(3.4rem,7vw,7.4rem); font-weight:400; line-height:.78; letter-spacing:-.035em; }
+h1 { margin:0; font-family:"Italiana",serif; font-size:clamp(3.4rem,6.2vw,6.7rem); font-weight:400; line-height:.8; letter-spacing:-.035em; text-wrap:balance; }
 .active-copy { display:flex; flex-direction:column; gap:.28rem; margin-top:1.25rem; padding-left:.8rem; border-left:1px solid var(--amber); text-transform:uppercase; }
 .active-copy span { color:var(--muted); font-size:.57rem; letter-spacing:.18em; }
 .active-copy strong { font-size:.68rem; font-weight:400; letter-spacing:.12em; }
@@ -50,7 +50,7 @@ footer a { justify-self:end; color:var(--ink); }
   .ambient__reflection { left:3%; right:3%; bottom:-8%; height:30%; opacity:.22; filter:blur(10px); transform:none; }
   .topbar { grid-template-columns:1fr auto; }
   .topbar > :nth-child(2) { display:none; }
-  .intro { top:5.5rem; }
+  .intro { top:5.5rem; width:calc(100vw - 2.5rem); }
   h1 { font-size:clamp(3.1rem,16vw,4.5rem); }
   .active-copy { margin-top:.9rem; }
   .interaction-hint { bottom:6.4rem; }
