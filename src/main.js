@@ -22,6 +22,26 @@ const photos = [
   { src:"/images/official/official-13.webp", title:"Until we meet again" },
 ];
 
+const loaderEl=document.querySelector("#loader");
+const loaderFill=document.querySelector("#loaderFill");
+const loaderPct=document.querySelector("#loaderPct");
+const loadingStarted=performance.now();
+let loaderDismissed=false;
+const loadingManager=new THREE.LoadingManager();
+loadingManager.onProgress=(_url,loaded,total)=>{
+  const pct=Math.round(loaded/Math.max(total,1)*100);
+  loaderFill.style.width=`${pct}%`; loaderPct.textContent=String(pct);
+};
+loadingManager.onLoad=()=>{
+  if(loaderDismissed)return;
+  loaderDismissed=true;
+  const wait=Math.max(0,900-(performance.now()-loadingStarted));
+  setTimeout(()=>{
+    loaderFill.style.width="100%"; loaderPct.textContent="100";
+    loaderEl.classList.add("is-hidden"); document.body.classList.add("gallery-ready");
+  },wait+180);
+};
+
 const canvas = document.querySelector("#scene");
 const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:"high-performance", precision:"highp" });
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -34,7 +54,7 @@ camera.position.set(0,.1,8.8);
 const group = new THREE.Group();
 scene.add(group);
 
-const loader = new THREE.TextureLoader();
+const loader = new THREE.TextureLoader(loadingManager);
 const cardProfiles = [
   [0.08,0.42,0.08,0.3],
   [0.5,0.08,0.34,0.08],

@@ -12,6 +12,15 @@
     <script type="module" src="/src/main.js"></script>
   </head>
   <body>
+    <div id="loader" class="loader" role="status" aria-live="polite" aria-label="Loading YAZZOON gallery">
+      <div class="loader__glow" aria-hidden="true"></div>
+      <div class="loader__inner">
+        <div class="loader__logo">YAZZOON</div>
+        <div class="loader__msg">Wir richten die Gewürze aus …</div>
+        <div class="loader__bar"><span id="loaderFill"></span></div>
+        <div class="loader__pct"><span id="loaderPct">0</span>%</div>
+      </div>
+    </div>
     <main class="gallery" aria-label="YAZZOON photo archive">
       <div class="ambient" aria-hidden="true">
         <div class="ambient__veil"></div>
