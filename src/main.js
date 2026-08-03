@@ -39,15 +39,19 @@ loadingManager.onProgress=(_url,loaded,total)=>{
   const pct=Math.round(loaded/Math.max(total,1)*100);
   loaderFill.style.width=`${pct}%`; loaderPct.textContent=String(pct);
 };
-loadingManager.onLoad=()=>{
+function dismissLoader(force=false){
   if(loaderDismissed)return;
   loaderDismissed=true;
-  const wait=Math.max(0,900-(performance.now()-loadingStarted));
+  const wait=force?0:Math.max(0,700-(performance.now()-loadingStarted));
   setTimeout(()=>{
     loaderFill.style.width="100%"; loaderPct.textContent="100";
     loaderEl.classList.add("is-hidden"); document.body.classList.add("gallery-ready");
-  },wait+180);
-};
+    const warm=()=>manageTextures(active,true);
+    if("requestIdleCallback" in window)requestIdleCallback(warm,{timeout:900}); else setTimeout(warm,120);
+  },wait+120);
+}
+loadingManager.onLoad=()=>dismissLoader(false);
+setTimeout(()=>dismissLoader(true),2000);
 
 const canvas = document.querySelector("#scene");
 const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:"high-performance", precision:"highp" });
@@ -122,8 +126,9 @@ function ensureTexture(index){
   },undefined,()=>{record.loading=false});
 }
 
-function manageTextures(index){
-  for(let offset=-3;offset<=3;offset++)ensureTexture(index+offset);
+function manageTextures(index,warmAll=loaderDismissed){
+  const radius=warmAll?3:1;
+  for(let offset=-radius;offset<=radius;offset++)ensureTexture(index+offset);
   meshes.forEach((record,i)=>{
     if(record.texture&&circularDistance(i,index)>6){
       record.texture.dispose(); record.texture=null;
