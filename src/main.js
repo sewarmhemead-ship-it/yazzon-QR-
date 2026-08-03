@@ -70,7 +70,7 @@ const meshes = photos.map((photo,index) => {
   const frame = new THREE.Mesh(frameGeometry,new THREE.MeshBasicMaterial({ color:0x080705, transparent:true, opacity:.96, side:THREE.DoubleSide }));
   frame.position.z=-.035;
   const reflection = new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({ color:0x17130e, transparent:true, opacity:.12, side:THREE.DoubleSide, depthWrite:false }));
-  reflection.scale.y=-.62;
+  reflection.scale.y=-.44;
   const unit = new THREE.Group();
   unit.add(frame,mesh,reflection);
   group.add(unit);
@@ -102,9 +102,6 @@ function manageTextures(index){
   });
 }
 
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(30,18),new THREE.MeshBasicMaterial({ color:0x7d542b, transparent:true, opacity:.11, side:THREE.DoubleSide }));
-floor.rotation.x=-Math.PI/2; floor.position.y=-2.2; floor.position.z=-2; scene.add(floor);
-
 let position=0, target=0, velocity=0, active=0, dragging=false, moved=false, startX=0, lastX=0;
 const dots=document.querySelector(".dots");
 photos.forEach((photo,index)=>{ const b=document.createElement("button"); b.type="button"; b.ariaLabel=`View photograph ${index+1}`; b.onclick=()=>{target=index;velocity=0}; dots.append(b); });
@@ -113,8 +110,6 @@ function wrap(value){ return ((value%photos.length)+photos.length)%photos.length
 function updateCopy(index){
   active=index;
   manageTextures(index);
-  document.querySelector("#ambientImage").src=photos[index].src;
-  document.querySelector("#reflectionImage").src=photos[index].src;
   document.querySelector("#counter").textContent=`${String(index+1).padStart(2,"0")} / ${String(photos.length).padStart(2,"0")}`;
   document.querySelector("#chapter").textContent=`Chapter ${String(index+1).padStart(2,"0")}`;
   document.querySelector("#caption").textContent=photos[index].title;
@@ -155,8 +150,8 @@ function frame(){
     const scale=Math.max(.58,1-Math.abs(d)*.18); unit.scale.setScalar(scale);
     mesh.material.opacity=Math.max(.16,1-Math.abs(d)*.3);
     frame.material.opacity=Math.max(.34,.96-Math.abs(d)*.22);
-    reflection.position.set(0,-3.02,.06);
-    reflection.material.opacity=Math.max(.025,.14-Math.abs(d)*.045);
+    reflection.position.set(0,-2.72,.06);
+    reflection.material.opacity=Math.max(.012,.072-Math.abs(d)*.024);
     reflection.material.map=mesh.material.map;
     unit.renderOrder=10-Math.round(Math.abs(d));
   });
