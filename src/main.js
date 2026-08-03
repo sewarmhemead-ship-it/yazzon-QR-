@@ -141,6 +141,10 @@ function wrap(value){ return ((value%photos.length)+photos.length)%photos.length
 function updateCopy(index){
   active=index;
   manageTextures(index);
+  const ambientImage=document.querySelector("#ambientImage");
+  ambientImage.style.opacity="0";
+  ambientImage.src=photos[index].src;
+  requestAnimationFrame(()=>{ ambientImage.style.opacity=""; });
   const collection=collections[photos[index].kind];
   document.documentElement.style.setProperty("--scene-accent",collection.accent);
   document.querySelector("#collectionLabel").textContent=collection.label;

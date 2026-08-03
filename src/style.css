@@ -20,7 +20,8 @@ a { text-decoration:none; }
 body.gallery-ready .gallery { animation-play-state:running; }
 @keyframes gallery-arrive { from { opacity:0; transform:scale(1.025); filter:blur(10px); } }
 .ambient { position:absolute; z-index:0; inset:0; overflow:hidden; pointer-events:none; background:#050403; }
-.ambient__veil { position:absolute; inset:0; background:radial-gradient(ellipse 48% 42% at 66% 51%,rgba(52,38,22,.16),transparent 76%),linear-gradient(90deg,#050403 0%,rgba(5,4,3,.96) 28%,rgba(5,4,3,.76) 67%,#050403 100%); }
+.ambient > img { position:absolute; inset:-5%; width:110%; height:110%; object-fit:cover; object-position:64% center; opacity:.32; filter:blur(19px) saturate(.7) contrast(1.14); transform:scale(1.04); mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.16) 30%,#000 58%,rgba(0,0,0,.78) 100%); transition:opacity .35s ease; }
+.ambient__veil { position:absolute; inset:0; background:radial-gradient(ellipse 48% 42% at 66% 51%,color-mix(in srgb,var(--scene-accent) 13%,transparent),transparent 76%),linear-gradient(90deg,#050403 0%,rgba(5,4,3,.96) 28%,rgba(5,4,3,.78) 67%,rgba(5,4,3,.9) 100%); }
 .ambient__light { position:absolute; left:24%; right:-4%; bottom:-14%; height:35%; opacity:.3; background:radial-gradient(ellipse at 55% 0%,color-mix(in srgb,var(--scene-accent) 38%,transparent),transparent 64%); filter:blur(28px); transition:background .8s ease; }
 #scene { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
 #scene:active { cursor:grabbing; }
@@ -56,6 +57,7 @@ footer a { justify-self:end; color:var(--ink); }
 @keyframes reveal { from { opacity:0; clip-path:inset(42% 42% round 20px); } }
 @keyframes breathe { to { opacity:.3; transform:scaleX(.55); transform-origin:left; } }
 @media (max-width:640px) {
+  .ambient > img { inset:-2%; width:104%; height:104%; object-position:center; opacity:.22; filter:blur(13px) saturate(.64) contrast(1.08); mask-image:linear-gradient(180deg,transparent 5%,#000 38%,rgba(0,0,0,.66) 82%,transparent); }
   .ambient__veil { background:radial-gradient(ellipse 70% 38% at 58% 54%,rgba(52,38,22,.13),transparent 76%),#050403; }
   .ambient__light { left:0; right:0; bottom:-5%; height:22%; opacity:.22; filter:blur(14px); }
   .topbar { grid-template-columns:1fr auto; }
