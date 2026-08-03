@@ -42,6 +42,8 @@ photos.forEach((photo,index)=>{ const b=document.createElement("button"); b.type
 function wrap(value){ return ((value%photos.length)+photos.length)%photos.length; }
 function updateCopy(index){
   active=index;
+  document.querySelector("#ambientImage").src=photos[index].src;
+  document.querySelector("#reflectionImage").src=photos[index].src;
   document.querySelector("#counter").textContent=`${String(index+1).padStart(2,"0")} / ${String(photos.length).padStart(2,"0")}`;
   document.querySelector("#chapter").textContent=`Chapter ${String(index+1).padStart(2,"0")}`;
   document.querySelector("#caption").textContent=photos[index].title;
