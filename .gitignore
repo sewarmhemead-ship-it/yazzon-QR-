@@ -1,4 +1,5 @@
 node_modules/
 dist/
 vite.log
+source-jpg/
 .DS_Store
