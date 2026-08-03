@@ -253,9 +253,11 @@ function frame(){
     const galleryOffset=innerWidth<640?0:1.05;
     const x=galleryOffset+Math.sin(angle)*(innerWidth<640?3.25:4.9);
     const z=(Math.cos(angle)-1)*4.8;
-    unit.position.set(x,-.38+Math.abs(d)*.16,z);
+    const mobile=innerWidth<640;
+    unit.position.set(x,mobile?-.92+Math.abs(d)*.12:-.38+Math.abs(d)*.16,z);
     unit.rotation.y=-d*.57;
-    const scale=Math.max(.58,1-Math.abs(d)*.18); unit.scale.setScalar(scale);
+    const baseScale=mobile?.78:1;
+    const scale=baseScale*Math.max(.58,1-Math.abs(d)*.18); unit.scale.setScalar(scale);
     mesh.material.opacity=Math.max(.16,1-Math.abs(d)*.3);
     frame.material.opacity=Math.max(.34,.96-Math.abs(d)*.22);
     reflection.position.set(0,-2.72,.06);
