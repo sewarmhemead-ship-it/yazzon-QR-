@@ -22,10 +22,35 @@ const group = new THREE.Group();
 scene.add(group);
 
 const loader = new THREE.TextureLoader();
-const geometry = new THREE.PlaneGeometry(3.65,2.42,1,1);
-const frameGeometry = new THREE.PlaneGeometry(3.78,2.55,1,1);
+const cardProfiles = [
+  [0.08,0.42,0.08,0.3],
+  [0.5,0.08,0.34,0.08],
+  [0.08,0.08,0.48,0.48],
+  [0.72,0.08,0.08,0.08],
+  [0.08,0.34,0.46,0.08],
+];
+
+function cardGeometry(width,height,radii,padding=0){
+  const w=width+padding*2,h=height+padding*2;
+  const [tl,tr,br,bl]=radii.map(r=>r+padding*.55);
+  const x=-w/2,y=-h/2;
+  const shape=new THREE.Shape();
+  shape.moveTo(x+bl,y);
+  shape.lineTo(x+w-br,y); shape.quadraticCurveTo(x+w,y,x+w,y+br);
+  shape.lineTo(x+w,y+h-tr); shape.quadraticCurveTo(x+w,y+h,x+w-tr,y+h);
+  shape.lineTo(x+tl,y+h); shape.quadraticCurveTo(x,y+h,x,y+h-tl);
+  shape.lineTo(x,y+bl); shape.quadraticCurveTo(x,y,x+bl,y);
+  const geometry=new THREE.ShapeGeometry(shape,8);
+  const uv=geometry.attributes.uv;
+  for(let i=0;i<uv.count;i++) uv.setXY(i,(uv.getX(i)-x)/w,(uv.getY(i)-y)/h);
+  uv.needsUpdate=true;
+  return geometry;
+}
+
 const meshes = photos.map((photo,index) => {
   const texture = loader.load(photo.src, tex => { tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4); });
+  const geometry=cardGeometry(3.65,2.42,cardProfiles[index]);
+  const frameGeometry=cardGeometry(3.65,2.42,cardProfiles[index],.075);
   const material = new THREE.MeshBasicMaterial({ map:texture, transparent:true, opacity:1, side:THREE.DoubleSide });
   const mesh = new THREE.Mesh(geometry,material);
   mesh.userData.index=index;
