@@ -23,8 +23,8 @@ const photos = [
 ];
 
 const canvas = document.querySelector("#scene");
-const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:!matchMedia("(max-width:640px)").matches, powerPreference:"high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia("(max-width:640px)").matches ? 1.25 : 1.75));
+const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:"high-performance", precision:"highp" });
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
@@ -84,7 +84,7 @@ function ensureTexture(index){
   record.loading=true;
   loader.load(photos[wrapped].src,texture=>{
     texture.colorSpace=THREE.SRGBColorSpace;
-    texture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
+    texture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),8);
     record.texture=texture; record.loading=false;
     record.mesh.material.map=texture; record.mesh.material.color.set(0xffffff); record.mesh.material.needsUpdate=true;
     record.reflection.material.map=texture; record.reflection.material.color.set(0xffffff); record.reflection.material.needsUpdate=true;
@@ -92,9 +92,9 @@ function ensureTexture(index){
 }
 
 function manageTextures(index){
-  for(let offset=-2;offset<=2;offset++)ensureTexture(index+offset);
+  for(let offset=-3;offset<=3;offset++)ensureTexture(index+offset);
   meshes.forEach((record,i)=>{
-    if(record.texture&&circularDistance(i,index)>4){
+    if(record.texture&&circularDistance(i,index)>6){
       record.texture.dispose(); record.texture=null;
       record.mesh.material.map=null; record.mesh.material.color.set(0x17130e); record.mesh.material.needsUpdate=true;
       record.reflection.material.map=null; record.reflection.material.color.set(0x17130e); record.reflection.material.needsUpdate=true;
