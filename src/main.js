@@ -141,6 +141,25 @@ function manageTextures(index,warmAll=loaderDismissed){
 let position=0, target=0, velocity=0, active=0, dragging=false, moved=false, startX=0, lastX=0;
 const dots=document.querySelector(".dots");
 photos.forEach((photo,index)=>{ const b=document.createElement("button"); b.type="button"; b.ariaLabel=`View photograph ${index+1}`; b.onclick=()=>{target=index;velocity=0}; dots.append(b); });
+const interactionHint=document.querySelector(".interaction-hint");
+const mobileProgressCurrent=document.querySelector("#mobileProgressCurrent");
+const mobileProgressTotal=document.querySelector("#mobileProgressTotal");
+const mobileProgressFill=document.querySelector("#mobileProgressFill");
+mobileProgressTotal.textContent=String(photos.length).padStart(2,"0");
+let userHasNavigated=false;
+let lastHapticIndex=0;
+
+function acknowledgeSwipe(){
+  if(userHasNavigated)return;
+  userHasNavigated=true;
+  interactionHint.classList.add("is-hidden");
+}
+
+function hapticTick(index){
+  if(!userHasNavigated||lastHapticIndex===index||innerWidth>=640||!navigator.vibrate)return;
+  lastHapticIndex=index;
+  navigator.vibrate(7);
+}
 
 function wrap(value){ return ((value%photos.length)+photos.length)%photos.length; }
 function updateCopy(index){
@@ -156,17 +175,20 @@ function updateCopy(index){
   document.querySelector("#counter").textContent=`${String(index+1).padStart(2,"0")} / ${String(photos.length).padStart(2,"0")}`;
   document.querySelector("#chapter").textContent=`Chapter ${String(index+1).padStart(2,"0")}`;
   document.querySelector("#caption").textContent=photos[index].title;
+  mobileProgressCurrent.textContent=String(index+1).padStart(2,"0");
+  mobileProgressFill.style.transform=`scaleX(${(index+1)/photos.length})`;
   [...dots.children].forEach((dot,i)=>dot.setAttribute("aria-current",String(i===index)));
 }
 
 function down(e){ dragging=true;moved=false;startX=lastX=e.clientX;velocity=0;canvas.setPointerCapture(e.pointerId); }
-function move(e){ if(!dragging)return; const dx=e.clientX-lastX; if(Math.abs(e.clientX-startX)>6)moved=true; position-=dx/(innerWidth<640?170:280); velocity=-dx/(innerWidth<640?170:280); lastX=e.clientX; }
+function move(e){ if(!dragging)return; const dx=e.clientX-lastX; if(Math.abs(e.clientX-startX)>6){moved=true;acknowledgeSwipe()} position-=dx/(innerWidth<640?170:280); velocity=-dx/(innerWidth<640?170:280); lastX=e.clientX; }
 const raycaster=new THREE.Raycaster();
 const pointerNdc=new THREE.Vector2();
 function up(e){
   if(!dragging)return;
   dragging=false;
   if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+  if(moved)acknowledgeSwipe();
   target=Math.round(position+velocity*5);
   if(!moved){
     pointerNdc.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);
@@ -250,6 +272,7 @@ function frame(){
   const dt=Math.min(clock.getDelta()*60,2);
   if(!dragging){ position+=(target-position)*Math.min(.12*dt,1); }
   const nearest=wrap(Math.round(position)); if(nearest!==active)updateCopy(nearest);
+  if(!dragging&&Math.abs(target-position)<.035)hapticTick(active);
   meshes.forEach(({unit,mesh,frame,reflection},index)=>{
     let d=index-position; while(d>photos.length/2)d-=photos.length; while(d<-photos.length/2)d+=photos.length;
     unit.visible=Math.abs(d)<3.15;

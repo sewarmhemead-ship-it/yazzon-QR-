@@ -49,6 +49,11 @@
       <input id="cameraInput" class="sr-only" type="file" accept="image/*" capture="environment" />
 
       <nav class="dots" aria-label="Choose photograph"></nav>
+      <div class="mobile-progress" aria-hidden="true">
+        <span id="mobileProgressCurrent">01</span>
+        <i><b id="mobileProgressFill"></b></i>
+        <span id="mobileProgressTotal">18</span>
+      </div>
 
       <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photograph detail" hidden>
         <img id="lightboxImage" alt="" />
